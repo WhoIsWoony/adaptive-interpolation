@@ -135,9 +135,9 @@ int invMatrix(int n, const double* A, double* b);
 void RMSEandPSNR(char* original_path, char* output_path);
 
 int main(void){
-    Interpolate(IN_BARBARA_256, IN_BARBARA_512_ORIGINAL, OUT_BARBARA_512, 2910.0);
-    Interpolate(IN_COUPLE_256, IN_COUPLE_512_ORIGINAL, OUT_COUPLE_512, 2300.0);
-    Interpolate(IN_LENA_256, IN_LENA_512_ORIGINAL, OUT_LENA_512, 2000.0);
+    Interpolate(IN_BARBARA_256, IN_BARBARA_512_ORIGINAL, OUT_BARBARA_512, 2300.0);
+    Interpolate(IN_COUPLE_256, IN_COUPLE_512_ORIGINAL, OUT_COUPLE_512, 2340.0);
+    Interpolate(IN_LENA_256, IN_LENA_512_ORIGINAL, OUT_LENA_512, 1900.0);
 
     RMSEandPSNR(IN_BARBARA_512_ORIGINAL, OUT_BARBARA_512);
     RMSEandPSNR(IN_COUPLE_512_ORIGINAL, OUT_COUPLE_512);
@@ -404,8 +404,8 @@ void AdaptiveInterpolation(Group groupList[25], img256_p3 input, img512 original
 
         //y
         int * hY = malloc1D(groupLength);
-        int * vY  = malloc1D(groupLength);
-        int * dY  = malloc1D(groupLength);
+        int * vY = malloc1D(groupLength);
+        int * dY = malloc1D(groupLength);
         getYofOriginal(hY, vY, dY, &groupList[group], original);
 
         //xTy (49 * length) * (length * 1) = 49 * 1
@@ -416,8 +416,8 @@ void AdaptiveInterpolation(Group groupList[25], img256_p3 input, img512 original
         {
             for (int j = 0; j < groupLength; j++) {
 				xTyH[i] += (xT[i][j] * hY[j]);
-				xTyV[i] += (xT[i][j] * dY[j]);
-				xTyD[i] += (xT[i][j] * vY[j]);
+				xTyV[i] += (xT[i][j] * vY[j]);
+				xTyD[i] += (xT[i][j] * dY[j]);
 			}
         }
 
@@ -438,24 +438,24 @@ void AdaptiveInterpolation(Group groupList[25], img256_p3 input, img512 original
         int node_i = 0;
         while(cur!=NULL){
 			double H_pixel = 0;
-			double D_pixel = 0;
 			double V_pixel = 0;
+			double D_pixel = 0;
 			for (int j = 0; j < 49; j++) {
 				H_pixel += x[node_i][j] * hF[j];
-				D_pixel += x[node_i][j] * vF[j];
-				V_pixel += x[node_i][j] * dF[j];
+				V_pixel += x[node_i][j] * vF[j];
+				D_pixel += x[node_i][j] * dF[j];
 			}
             H_pixel = (H_pixel < 0 ? 0 : H_pixel);
             H_pixel = (H_pixel > 255 ? 255 : H_pixel);
-            D_pixel = (D_pixel < 0 ? 0 : D_pixel);
-            D_pixel = (D_pixel > 255 ? 255 : D_pixel);
             V_pixel = (V_pixel < 0 ? 0 : V_pixel);
             V_pixel = (V_pixel > 255 ? 255 : V_pixel);
+            D_pixel = (D_pixel < 0 ? 0 : D_pixel);
+            D_pixel = (D_pixel > 255 ? 255 : D_pixel);
 			
 			output[2 * (cur->r) + 1][2 * (cur->c)] = (PIXEL)(H_pixel + 0.5); // H
 			output[2 * (cur->r)][2 * (cur->c) + 1] = (PIXEL)(V_pixel + 0.5); // V
-            output[2 * (cur->r)][2 * (cur->c)] = (PIXEL)(D_pixel + 0.5); // D
-			output[2 * (cur->r) + 1][2 * (cur->c) + 1] = input[(cur->r)+3][(cur->c)+3]; // Original
+			output[2 * (cur->r)][2 * (cur->c)] = (PIXEL)(D_pixel + 0.5); // D
+            output[2 * (cur->r)+ 1][2 * (cur->c) + 1] = input[(cur->r)+3][(cur->c)+3] + 5;
             
             cur = cur->next;
             node_i++;
